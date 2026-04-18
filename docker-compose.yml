@@ -1,0 +1,26 @@
+services:
+  braincell-dashboard:
+    build:
+      context: ../
+      dockerfile: ITL.BrainCell.Dashboard/Dockerfile
+    image: itlusions/braincell-dashboard:latest
+    container_name: braincell-dashboard
+    ports:
+      - "9507:8001"
+    environment:
+      - DATABASE_URL=${DATABASE_URL:-postgresql://braincell:braincell@braincell-postgres:5432/braincell}
+      - BRAINCELL_API_URL=${BRAINCELL_API_URL:-http://braincell-api:8000}
+      - ENVIRONMENT=${ENVIRONMENT:-production}
+    networks:
+      - braincell-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  braincell-network:
+    external: true
+    name: braincell-network
