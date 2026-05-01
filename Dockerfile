@@ -27,6 +27,12 @@ COPY ITL.BrainCell/src/services src/services
 COPY ITL.BrainCell.Dashboard/src/web src/web
 COPY ITL.BrainCell.Dashboard/src/__init__.py src/__init__.py
 
+# Copy Alembic configuration and migrations
+COPY ITL.BrainCell/alembic.ini .
+COPY ITL.BrainCell/alembic alembic
+COPY ITL.BrainCell/docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
 RUN addgroup braincell && adduser -D -G braincell braincell && \
     chown -R braincell:braincell /app
 
@@ -37,4 +43,5 @@ EXPOSE 8001
 HEALTHCHECK --interval=10s --timeout=5s --retries=5 \
     CMD curl -f http://localhost:8001/ || exit 1
 
+ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["python", "-m", "uvicorn", "src.web.app:app", "--host", "0.0.0.0", "--port", "8001"]
